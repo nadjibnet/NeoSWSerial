@@ -291,6 +291,17 @@ void NeoSWSerial::attachInterrupt( isr_t fn )
 
 //----------------------------------------------------------------------------
 
+void NeoSWSerial::attachInterrupt2( isr_t2 fn )
+{
+  uint8_t oldSREG = SREG;
+  cli();
+    _isr2 = fn;
+  SREG = oldSREG;
+
+} // attachInterrupt
+
+//----------------------------------------------------------------------------
+
 void NeoSWSerial::startChar()
 {
   rxState = 0;     // got a start bit
@@ -409,8 +420,10 @@ bool NeoSWSerial::checkRxTime()
 void NeoSWSerial::rxChar( uint8_t c )
 {
   if (listener) {
-    if (listener->_isr)
-      listener->_isr( c );
+    if (listener->_isr || listener->_isr2){
+      if(listener->_isr) listener->_isr( c );
+      if(listener->_isr2) listener->_isr2(listener->rxPin , c );
+    }
     else {
       uint8_t index = (rxHead+1) % RX_BUFFER_SIZE;
       if (index != rxTail) {
