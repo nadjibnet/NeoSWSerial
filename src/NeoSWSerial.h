@@ -70,6 +70,7 @@ public:
       rxPin = receivePin;
       txPin = transmitPin;
       _isr  = (isr_t) NULL;
+      _isr2  = (isr_t2) NULL;
     }
 
           void   begin(uint16_t baudRate=9600);   // initialize, set baudrate, listen
@@ -84,9 +85,13 @@ public:
   virtual void   flush() {};
           void   end() { ignore(); }
 
-  typedef void (* isr_t)( uint8_t );
+  typedef void (* isr_t)(uint8_t);
+  typedef void (* isr_t2)(uint8_t,uint8_t);
+  
   void attachInterrupt( isr_t fn );
+  void attachInterrupt2( isr_t2 fn );
   void detachInterrupt() { attachInterrupt( (isr_t) NULL ); };
+  void detachInterrupt2() { attachInterrupt2( (isr_t2) NULL ); };
 
 private:
            uint8_t  rxPin, txPin;
@@ -94,6 +99,7 @@ private:
 
   uint16_t _baudRate;
   isr_t    _isr;
+  isr_t2    _isr2;
 
   static void rxChar( uint8_t rx ); // buffer or dispatch one received character
 
